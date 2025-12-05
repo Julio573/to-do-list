@@ -1,6 +1,7 @@
 package com.to_do.list.controller;
 
 import com.to_do.list.dto.UpdateEmailDTO;
+import com.to_do.list.dto.UpdatePasswordDTO;
 import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.service.UserService;
@@ -31,6 +32,12 @@ public class UserController {
     @PatchMapping("/{id}/email")
     public ResponseEntity<UserResponseDTO> updateEmail(@PathVariable Long id, @Valid @RequestBody UpdateEmailDTO updateEmailDTO) {
         UserResponseDTO userResponseDTO = userService.updateEmail(id, updateEmailDTO.getEmail());
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+    @PatchMapping("/{id}/newPassword")
+    public ResponseEntity<UserResponseDTO> updatePassword(@PathVariable Long id, @Valid @RequestBody UpdatePasswordDTO updatePasswordDTO) {
+        UserResponseDTO userResponseDTO = userService.updatePassword(id, updatePasswordDTO);
         return ResponseEntity.ok(userResponseDTO);
     }
 }
