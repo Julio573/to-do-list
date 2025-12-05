@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/user")
 @RequiredArgsConstructor
@@ -39,5 +41,10 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> updatePassword(@PathVariable Long id, @Valid @RequestBody UpdatePasswordDTO updatePasswordDTO) {
         UserResponseDTO userResponseDTO = userService.updatePassword(id, updatePasswordDTO);
         return ResponseEntity.ok(userResponseDTO);
+    }
+
+    @GetMapping("/listUsers")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 }
