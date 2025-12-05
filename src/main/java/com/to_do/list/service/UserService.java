@@ -23,4 +23,14 @@ public class UserService {
         user = userRepository.save(user);
         return userMapper.toDTO(user);
     }
+
+    public UserResponseDTO updateEmail(Long id, String newEmail) {
+        User user = userRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setEmail(newEmail);
+        user =  userRepository.save(user);
+        return userMapper.toDTO(user);
+    }
+
 }
