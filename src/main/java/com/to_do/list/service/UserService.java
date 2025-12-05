@@ -1,5 +1,6 @@
 package com.to_do.list.service;
 
+import com.to_do.list.dto.UpdatePasswordDTO;
 import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
@@ -30,6 +31,19 @@ public class UserService {
 
         user.setEmail(newEmail);
         user =  userRepository.save(user);
+        return userMapper.toDTO(user);
+    }
+
+    public UserResponseDTO updatePassword(Long id, UpdatePasswordDTO updatePasswordDTO) {
+        User user = userRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getPassword().equals(updatePasswordDTO.getOldPassword())) {
+            throw new RuntimeException("Old password doesn't match");
+        }
+
+        user.setPassword(updatePasswordDTO.getNewPassword());
+        userRepository.save(user);
         return userMapper.toDTO(user);
     }
 
