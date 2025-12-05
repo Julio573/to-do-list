@@ -8,6 +8,8 @@ import com.to_do.list.entities.User;
 import com.to_do.list.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -45,6 +47,12 @@ public class UserService {
         user.setPassword(updatePasswordDTO.getNewPassword());
         userRepository.save(user);
         return userMapper.toDTO(user);
+    }
+
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper :: toDTO)
+                .toList();
     }
 
 }
