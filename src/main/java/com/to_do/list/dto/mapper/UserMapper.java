@@ -3,8 +3,7 @@ package com.to_do.list.dto.mapper;
 import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.entities.User;
-import org.mapstruct.Mapper;
-
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
