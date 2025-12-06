@@ -5,6 +5,7 @@ import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
+import com.to_do.list.exception.UserNotFoundException;
 import com.to_do.list.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class UserService {
 
     public UserResponseDTO updateEmail(Long id, String newEmail) {
         User user = userRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("User not found"));
+                orElseThrow(() -> new UserNotFoundException("User not found"));
 
         user.setEmail(newEmail);
         user =  userRepository.save(user);
