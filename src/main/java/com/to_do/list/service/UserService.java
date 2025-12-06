@@ -6,6 +6,7 @@ import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
 import com.to_do.list.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,6 +48,22 @@ public class UserService {
         user.setPassword(updatePasswordDTO.getNewPassword());
         userRepository.save(user);
         return userMapper.toDTO(user);
+    }
+
+    @Transactional
+    public UserResponseDTO findById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return userMapper.toDTO(user);
+    }
+
+    @Transactional
+    public void deleteByEmail(String email) {
+        User user =  userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        userRepository.delete(user);
     }
 
     public List<UserResponseDTO> getAllUsers() {
