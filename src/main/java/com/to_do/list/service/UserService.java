@@ -38,6 +38,10 @@ public class UserService {
         User user = userRepository.findById(id).
                 orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new InvalidEmailException("Email Already Address Exists   ");
+        }
+
         user.setEmail(newEmail);
         user =  userRepository.save(user);
         return userMapper.toDTO(user);
