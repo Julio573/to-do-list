@@ -5,6 +5,7 @@ import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
+import com.to_do.list.exception.EmailNotFoundException;
 import com.to_do.list.exception.IncorrectPasswordMatchException;
 import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.exception.UserNotFoundException;
@@ -40,7 +41,7 @@ public class UserService {
     @Transactional
     public UserResponseDTO updateEmail(Long id, String newEmail) {
         User user = userRepository.findById(id).
-                orElseThrow(() -> new UserNotFoundException("User not found"));
+                orElseThrow(() -> new UserNotFoundException("User not found with id" + id));
 
         userRepository.findByEmail(newEmail).ifPresent(u -> {
             throw new InvalidEmailException("Email already exists");
@@ -76,7 +77,7 @@ public class UserService {
     @Transactional
     public void deleteByEmail(String email) {
         User user =  userRepository.findByEmail(email)
-                .orElseThrow(() -> new InvalidEmailException("Email Address not found"));
+                .orElseThrow(() -> new EmailNotFoundException("Email Address not found"));
 
         userRepository.delete(user);
     }
