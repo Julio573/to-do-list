@@ -28,7 +28,7 @@ public class UserService {
         User user = userMapper.toEntity(userRequestDTO);
 
         if (userRepository.findByEmail(userRequestDTO.getEmail()).isPresent()) {
-            throw new InvalidEmailException("Email Already Address Exists   ");
+            throw new InvalidEmailException("Email Address Already Exists");
         }
         user = userRepository.save(user);
         return userMapper.toDTO(user);
@@ -39,7 +39,7 @@ public class UserService {
                 orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (userRepository.findByEmail(newEmail).isPresent()) {
-            throw new InvalidEmailException("Email Already Address Exists   ");
+            throw new InvalidEmailException("Email Address Already Exists");
         }
 
         user.setEmail(newEmail);
