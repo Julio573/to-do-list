@@ -5,6 +5,7 @@ import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
+import com.to_do.list.exception.IncorrectPasswordMatchException;
 import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.exception.UserNotFoundException;
 import com.to_do.list.repository.UserRepository;
@@ -53,10 +54,10 @@ public class UserService {
     @Transactional
     public UserResponseDTO updatePassword(Long id, UpdatePasswordDTO updatePasswordDTO) {
         User user = userRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("User not found"));
+                orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!user.getPassword().equals(updatePasswordDTO.getOldPassword())) {
-            throw new RuntimeException("Old password doesn't match");
+            throw new IncorrectPasswordMatchException("Old password doesn't match");
         }
 
         user.setPassword(updatePasswordDTO.getNewPassword());
