@@ -68,7 +68,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDTO findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return userMapper.toDTO(user);
     }
@@ -76,7 +76,7 @@ public class UserService {
     @Transactional
     public void deleteByEmail(String email) {
         User user =  userRepository.findByEmail(email)
-                .orElseThrow(() -> new InvalidEmailException("User not found"));
+                .orElseThrow(() -> new InvalidEmailException("Email Address not found"));
 
         userRepository.delete(user);
     }
