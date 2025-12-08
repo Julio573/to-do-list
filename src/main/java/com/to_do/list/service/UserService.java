@@ -27,9 +27,10 @@ public class UserService {
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
         User user = userMapper.toEntity(userRequestDTO);
 
-        if (userRepository.findByEmail(userRequestDTO.getEmail()).isPresent()) {
-            throw new InvalidEmailException("Email Address Already Exists");
-        }
+        userRepository.findByEmail(userRequestDTO.getEmail()).ifPresent(u -> {
+            throw new InvalidEmailException("Email already exists");
+        });
+
         user = userRepository.save(user);
         return userMapper.toDTO(user);
     }
@@ -38,9 +39,9 @@ public class UserService {
         User user = userRepository.findById(id).
                 orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (userRepository.findByEmail(newEmail).isPresent()) {
-            throw new InvalidEmailException("Email Address Already Exists");
-        }
+        userRepository.findByEmail(newEmail).ifPresent(u -> {
+            throw new InvalidEmailException("Email already exists");
+        });
 
         user.setEmail(newEmail);
         user =  userRepository.save(user);
@@ -71,7 +72,7 @@ public class UserService {
     @Transactional
     public void deleteByEmail(String email) {
         User user =  userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new InvalidEmailException("User not found"));
 
         userRepository.delete(user);
     }
