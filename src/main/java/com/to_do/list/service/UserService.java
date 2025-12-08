@@ -5,6 +5,7 @@ import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
+import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.exception.UserNotFoundException;
 import com.to_do.list.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +26,10 @@ public class UserService {
 
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
         User user = userMapper.toEntity(userRequestDTO);
+
+        if (userRepository.findByEmail(userRequestDTO.getEmail()).isPresent()) {
+            throw new InvalidEmailException("Email Already Address Exists   ");
+        }
         user = userRepository.save(user);
         return userMapper.toDTO(user);
     }
