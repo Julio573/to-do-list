@@ -1,6 +1,7 @@
 package com.to_do.list.exception.handler;
 
 import com.to_do.list.dto.ApiErrorDTO;
+import com.to_do.list.exception.IncorrectPasswordMatchException;
 import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -31,5 +32,15 @@ public class UserGlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(apiErrorDTO);
+    }
+
+    @ExceptionHandler(IncorrectPasswordMatchException.class)
+    ResponseEntity<ApiErrorDTO> handleIncorrectPasswordMatchException(IncorrectPasswordMatchException e) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiErrorDTO);
     }
 }
