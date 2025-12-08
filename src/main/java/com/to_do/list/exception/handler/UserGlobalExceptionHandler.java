@@ -23,5 +23,13 @@ public class UserGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorDTO);
     }
 
-
+    @ExceptionHandler(InvalidEmailException.class)
+    ResponseEntity<ApiErrorDTO> handleInvalidEmailException(InvalidEmailException e) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
+                HttpStatus.CONFLICT.value(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiErrorDTO);
+    }
 }
