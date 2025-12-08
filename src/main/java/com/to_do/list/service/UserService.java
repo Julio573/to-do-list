@@ -8,7 +8,7 @@ import com.to_do.list.entities.User;
 import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.exception.UserNotFoundException;
 import com.to_do.list.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +24,7 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
+    @Transactional
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
         User user = userMapper.toEntity(userRequestDTO);
 
@@ -35,6 +36,7 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
+    @Transactional
     public UserResponseDTO updateEmail(Long id, String newEmail) {
         User user = userRepository.findById(id).
                 orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -48,6 +50,7 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
+    @Transactional
     public UserResponseDTO updatePassword(Long id, UpdatePasswordDTO updatePasswordDTO) {
         User user = userRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("User not found"));
@@ -61,7 +64,7 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public UserResponseDTO findById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -77,6 +80,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper :: toDTO)
