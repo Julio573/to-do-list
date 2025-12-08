@@ -14,9 +14,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ApiErrorDTO {
 
-    private int status;
-    private String message;
-
     @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     private LocalDateTime timestamp;
+    private int status;
+    private String error;
+    private String message;
+    private String path;
+    private String method;
+    private String requestID;
+
+
+
 }
