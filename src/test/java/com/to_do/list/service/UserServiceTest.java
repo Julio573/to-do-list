@@ -6,6 +6,7 @@ import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
 import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,12 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +34,28 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    private User user;
+    private UserRequestDTO userRequestDTO;
+    private UserResponseDTO userResponseDTO;
+
+    private static final Long USER_ID = 1L;
+    private static final String NAME = "julio";
+    private static final String EMAIL = "julio@teste.com";
+    private static final String PASSWORD = "Test@157";
+
+    @BeforeEach
+    void setUp() {
+        user = new User();
+        user.setId(USER_ID);
+        user.setName(NAME);
+        user.setEmail(EMAIL);
+        user.setPassword(PASSWORD);
+
+        userRequestDTO = new UserRequestDTO(NAME, EMAIL, PASSWORD);
+
+        userResponseDTO = new UserResponseDTO(NAME, EMAIL);
+    }
 
 
     @Nested
@@ -71,8 +94,6 @@ public class UserServiceTest {
             verify(userRepository).findByEmail(userRequestDTO.getEmail());
             verify(userRepository).save(user);
             verify(userMapper).toDTO(user);
-
-
         }
 
         @Test
@@ -99,7 +120,37 @@ public class UserServiceTest {
         }
     }
 
+    @Nested
+    class UpdateEmailTests {
 
+        @Test
+        @DisplayName("Should update email when the new email isn't registered")
+        void shouldUpdateEmailWhenNewEmailIsNotRegistered() {
+
+            User user = new User();
+            user.setId(1);
+            user.setEmail("julio@teste.com");
+
+            String newEmail = "newEmail@Teste.com";
+
+            UserResponseDTO userResponseDTO = new UserResponseDTO();
+            userResponseDTO.setEmail(newEmail);
+
+            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+            when(userRepository.findByEmail(newEmail)).thenReturn(Optional.empty());
+            when(userRepository.save(user)).thenReturn(user);
+            when(userMapper.toDTO(user)).thenReturn(userResponseDTO);
+
+            var result = userService.updateEmail(user.getId(), newEmail);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getEmail()).isEqualTo(newEmail);
+
+            verify(userRepository).findById(user.getId());
+            verify(userRepository).findByEmail(newEmail);
+            verify(userRepository).save(user);
+        }
+    }
 
 }
 
