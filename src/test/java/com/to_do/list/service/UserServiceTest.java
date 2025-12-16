@@ -67,7 +67,7 @@ public class UserServiceTest {
         void shouldCreateUserSuccessfullyWhenEmailDoesNotExist() {
 
             when(userMapper.toEntity(userRequestDTO)).thenReturn(user);
-            when(userRepository.findByEmail(userRequestDTO.getEmail())).thenReturn(Optional.empty());
+            when(userRepository.findByEmail(userRequestDTO.getEmail())).thenReturn(Optional.of(user));
             when(userRepository.save(user)).thenReturn(user);
 
             when(userMapper.toDTO(user)).thenReturn(userResponseDTO);
@@ -133,14 +133,31 @@ public class UserServiceTest {
         }
 
         @Test
+        @DisplayName("Should throw UserNotFoundException when user's ID isn't found")
+        void shouldThrowUserNotFoundExceptionWhenUserIsNotFound() {
+            when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+            UserNotFoundException userNotFoundException = assertThrows(
+                    UserNotFoundException.class,
+                    () -> userService.updateEmail(user.getId(), userRequestDTO.getEmail())
+            );
+
+            assertThat(userNotFoundException.getMessage()).isEqualTo("User not found with id" + user.getId());
+
+            verify(userRepository).findById(user.getId());
+            verify(userRepository, never()).save(any());
+            verify(userRepository, never()).findByEmail(any());
+        }
+
+        @Test
         @DisplayName("Should throw InvalidEmailException when the new email is already registered")
         void ShouldThrowInvalidEmailExceptionWhenNewEmailIsAlreadyRegistered() {
 
             String newEmail = "newEmail@Test.com";
 
-            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+            when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
             when(userRepository.findByEmail(newEmail)).thenReturn(Optional.of(user));
-            
+
             InvalidEmailException invalidEmailException = assertThrows(
                     InvalidEmailException.class,
                     () -> userService.updateEmail(user.getId(), newEmail));
