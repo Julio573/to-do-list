@@ -86,10 +86,6 @@ public class UserServiceTest {
         @Test
         @DisplayName("Should throw InvalidEmailException when the email is already registered")
         void shouldThrowInvalidEmailExceptionWhenEmailIsAlreadyRegistered() {
-            UserRequestDTO userRequestDTO = new UserRequestDTO();
-            userRequestDTO.setName("julio");
-            userRequestDTO.setEmail("julio@teste.com");
-            userRequestDTO.setPassword("Test@157");
 
             User userExists = new User();
             userExists.setEmail(userRequestDTO.getEmail());
@@ -104,6 +100,7 @@ public class UserServiceTest {
             assertThat(exception.getMessage()).isEqualTo("Email already exists");
 
             verify(userRepository).findByEmail(userRequestDTO.getEmail());
+            verify(userRepository, never()).save(any());
         }
     }
 
