@@ -4,6 +4,7 @@ import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
+import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,6 +73,29 @@ public class UserServiceTest {
             verify(userMapper).toDTO(user);
 
 
+        }
+
+        @Test
+        @DisplayName("Should throw InvalidEmailException when the email is already registered")
+        void shouldThrowInvalidEmailExceptionWhenEmailIsAlreadyRegistered() {
+            UserRequestDTO userRequestDTO = new UserRequestDTO();
+            userRequestDTO.setName("julio");
+            userRequestDTO.setEmail("julio@teste.com");
+            userRequestDTO.setPassword("Test@157");
+
+            User userExists = new User();
+            userExists.setEmail(userRequestDTO.getEmail());
+
+            when(userRepository.findByEmail(userRequestDTO.getEmail())).thenReturn(Optional.of(userExists));
+
+            InvalidEmailException exception = assertThrows(
+                    InvalidEmailException.class,
+                    () -> userService.createUser(userRequestDTO)
+            );
+
+            assertThat(exception.getMessage()).isEqualTo("Email already exists");
+
+            verify(userRepository).findByEmail(userRequestDTO.getEmail());
         }
     }
 
