@@ -5,6 +5,7 @@ import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
 import com.to_do.list.exception.InvalidEmailException;
+import com.to_do.list.exception.UserNotFoundException;
 import com.to_do.list.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -111,10 +112,6 @@ public class UserServiceTest {
         @DisplayName("Should update email when the new email isn't registered")
         void shouldUpdateEmailWhenNewEmailIsNotRegistered() {
 
-            User user = new User();
-            user.setId(1);
-            user.setEmail("julio@teste.com");
-
             String newEmail = "newEmail@Teste.com";
 
             UserResponseDTO userResponseDTO = new UserResponseDTO();
@@ -134,7 +131,29 @@ public class UserServiceTest {
             verify(userRepository).findByEmail(newEmail);
             verify(userRepository).save(user);
         }
-    }
 
+        @Test
+        @DisplayName("Should throw InvalidEmailException when the new email is already registered")
+        void ShouldThrowInvalidEmailExceptionWhenNewEmailIsAlreadyRegistered() {
+
+            String newEmail = "newEmail@Test.com";
+
+            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+            when(userRepository.findByEmail(newEmail)).thenReturn(Optional.of(user));
+            
+            InvalidEmailException invalidEmailException = assertThrows(
+                    InvalidEmailException.class,
+                    () -> userService.updateEmail(user.getId(), newEmail));
+
+            assertThat(invalidEmailException.getMessage()).isEqualTo("Email already exists");
+            verify(userRepository).findById(user.getId());
+            verify(userRepository).findByEmail(newEmail);
+            verify(userRepository, never()).save(any());
+        }
+    }
 }
+
+
+
+
 
