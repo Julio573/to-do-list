@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -57,7 +56,6 @@ public class UserServiceTest {
 
         userResponseDTO = new UserResponseDTO(NAME, EMAIL);
     }
-
 
     @Nested
     class SaveUserTests {
@@ -166,6 +164,26 @@ public class UserServiceTest {
             verify(userRepository).findById(user.getId());
             verify(userRepository).findByEmail(newEmail);
             verify(userRepository, never()).save(any());
+        }
+    }
+
+    @Nested
+    class UpdatePasswordTests {
+
+        @Test
+        @DisplayName("Should update user's password successfully")
+        void shouldUpdateUserPasswordSuccessfully() {
+
+            String newPassword = "NewTest@157";
+            UserRequestDTO userRequestDTO = new UserRequestDTO(NAME, EMAIL, PASSWORD);
+            userRequestDTO.setPassword(newPassword);
+
+            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+            when(userRepository.save(user)).thenReturn(user);
+            when(userMapper.toDTO(user)).thenReturn(userResponseDTO);
+
+            //var result = userService.updatePassword(user.getId(), userRequestDTO.getPassword());
+
         }
     }
 }
