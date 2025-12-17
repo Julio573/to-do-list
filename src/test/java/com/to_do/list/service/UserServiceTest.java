@@ -5,6 +5,7 @@ import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
 import com.to_do.list.entities.User;
+import com.to_do.list.exception.IncorrectPasswordMatchException;
 import com.to_do.list.exception.InvalidEmailException;
 import com.to_do.list.exception.UserNotFoundException;
 import com.to_do.list.repository.UserRepository;
@@ -208,6 +209,27 @@ public class UserServiceTest {
             verify(userRepository).findById(user.getId());
             verify(userRepository, never()).save(any());
             verify(userRepository, never()).findByEmail(any());
+        }
+
+        @Test
+        @DisplayName("Should throw an error when old password doesn't match")
+        void shouldThrowAnErrorWhenOldPasswordDoesNotMatch() {
+
+            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+            String originalPassword = user.getPassword();
+
+            IncorrectPasswordMatchException incorrectPasswordMatchException = assertThrows(
+                    IncorrectPasswordMatchException.class,
+                    () -> userService.updatePassword(user.getId(), updatePasswordDTO)
+            );
+
+            assertThat(incorrectPasswordMatchException.getMessage()).isEqualTo("Old password doesn't match");
+            assertThat(user.getPassword()).isEqualTo(originalPassword);
+            assertThat(user.getPassword()).isNotEqualTo(NEWPASSWORD);
+
+            verify(userRepository).findById(user.getId());
+            verify(userRepository, never()).save(any());
         }
     }
 }
