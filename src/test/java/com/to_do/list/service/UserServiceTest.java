@@ -192,6 +192,23 @@ public class UserServiceTest {
             verify(userRepository).save(user);
             verify(userMapper).toDTO(user);
         }
+
+        @Test
+        @DisplayName("Should throw an error when user's id is not found")
+        void shouldThrowAnErrorWhenUserIsNotFound() {
+            when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+            UserNotFoundException userNotFoundException = assertThrows(
+                    UserNotFoundException.class,
+                    () -> userService.updatePassword(user.getId(), updatePasswordDTO)
+            );
+
+            assertThat(userNotFoundException.getMessage()).isEqualTo("User not found with id");
+
+            verify(userRepository).findById(user.getId());
+            verify(userRepository, never()).save(any());
+            verify(userRepository, never()).findByEmail(any());
+        }
     }
 }
 
