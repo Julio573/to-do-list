@@ -1,5 +1,6 @@
 package com.to_do.list.service;
 
+import com.to_do.list.dto.UpdatePasswordDTO;
 import com.to_do.list.dto.UserRequestDTO;
 import com.to_do.list.dto.UserResponseDTO;
 import com.to_do.list.dto.mapper.UserMapper;
@@ -38,11 +39,13 @@ public class UserServiceTest {
     private User user;
     private UserRequestDTO userRequestDTO;
     private UserResponseDTO userResponseDTO;
+    private UpdatePasswordDTO updatePasswordDTO;
 
     private static final Long USER_ID = 1L;
     private static final String NAME = "julio";
     private static final String EMAIL = "julio@teste.com";
     private static final String PASSWORD = "Test@157";
+    private static final String NEWPASSWORD = "NewTest@157";
 
     @BeforeEach
     void setUp() {
@@ -53,8 +56,10 @@ public class UserServiceTest {
         user.setPassword(PASSWORD);
 
         userRequestDTO = new UserRequestDTO(NAME, EMAIL, PASSWORD);
-
         userResponseDTO = new UserResponseDTO(NAME, EMAIL);
+        updatePasswordDTO = new UpdatePasswordDTO(PASSWORD,  NEWPASSWORD);
+
+
     }
 
     @Nested
@@ -174,16 +179,18 @@ public class UserServiceTest {
         @DisplayName("Should update user's password successfully")
         void shouldUpdateUserPasswordSuccessfully() {
 
-            String newPassword = "NewTest@157";
-            UserRequestDTO userRequestDTO = new UserRequestDTO(NAME, EMAIL, PASSWORD);
-            userRequestDTO.setPassword(newPassword);
-
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(userRepository.save(user)).thenReturn(user);
             when(userMapper.toDTO(user)).thenReturn(userResponseDTO);
 
-            //var result = userService.updatePassword(user.getId(), userRequestDTO.getPassword());
+            var result = userService.updatePassword(user.getId(), updatePasswordDTO);
 
+            assertThat(result).isNotNull();
+            assertThat(user.getPassword()).isEqualTo(updatePasswordDTO.getNewPassword());
+
+            verify(userRepository).findById(user.getId());
+            verify(userRepository).save(user);
+            verify(userMapper).toDTO(user);
         }
     }
 }
