@@ -59,8 +59,6 @@ public class UserServiceTest {
         userRequestDTO = new UserRequestDTO(NAME, EMAIL, PASSWORD);
         userResponseDTO = new UserResponseDTO(NAME, EMAIL);
         updatePasswordDTO = new UpdatePasswordDTO(PASSWORD,  NEWPASSWORD);
-
-
     }
 
     @Nested
@@ -230,6 +228,29 @@ public class UserServiceTest {
 
             verify(userRepository).findById(user.getId());
             verify(userRepository, never()).save(any());
+        }
+    }
+
+    @Nested
+    class FindByIdTests {
+
+        @Test
+        @DisplayName("Should find user by Id")
+        void shouldFindUserById() {
+
+            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+            when(userMapper.toDTO(user)).thenReturn(userResponseDTO);
+
+            var result = userService.findById(user.getId());
+
+            assertThat(result).isNotNull();
+            assertThat(user.getName()).isEqualTo(result.getName());
+            assertThat(user.getEmail()).isEqualTo(result.getEmail());
+
+            verify(userRepository).findById(user.getId());
+            verify(userMapper).toDTO(user);
+            verify(userRepository, never()).save(any());
+
         }
     }
 }
