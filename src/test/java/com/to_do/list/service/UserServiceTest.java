@@ -252,6 +252,23 @@ public class UserServiceTest {
             verify(userRepository, never()).save(any());
 
         }
+
+        @Test
+        @DisplayName("Should throw UserNotFoundException when user's ID isn't found")
+        void shouldThrowUserNotFoundExceptionWhenUserIsNotFound() {
+            when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+            UserNotFoundException userNotFoundException = assertThrows(
+                    UserNotFoundException.class,
+                    () -> userService.updateEmail(user.getId(), userRequestDTO.getEmail())
+            );
+
+            assertThat(userNotFoundException.getMessage()).isEqualTo("User not found");
+
+            verify(userRepository).findById(user.getId());
+            verify(userRepository, never()).save(any());
+            verify(userRepository, never()).findByEmail(any());
+        }
     }
 }
 
